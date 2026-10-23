@@ -5,6 +5,8 @@ import AppLayout from './layouts/AppLayout';
 import LoginView from './features/auth/LoginView';
 import RegisterView from './features/auth/RegisterView';
 import DashboardView from './features/dashboard/DashboardView';
+import ProductsView from './features/products/ProductsView';
+import CategoriesView from './features/categories/CategoriesView';
 import SectionPlaceholder from './components/SectionPlaceholder';
 import { Loader2 } from 'lucide-react';
 
@@ -80,26 +82,8 @@ export default function App() {
           >
             <Route index element={<Navigate to="/dashboard" replace />} />
             <Route path="dashboard" element={<DashboardView />} />
-            <Route
-              path="products"
-              element={
-                <SectionPlaceholder
-                  title="Gestión de Catálogo y Productos"
-                  phase="Fase 3: Catálogo"
-                  description="En la siguiente fase conectaremos el CRUD completo de productos, validación de SKU por tienda, filtros por categoría y alertas visuales de existencias."
-                />
-              }
-            />
-            <Route
-              path="categories"
-              element={
-                <SectionPlaceholder
-                  title="Categorías de Productos"
-                  phase="Fase 3: Categorías"
-                  description="Gestión y clasificación de productos para organizar el catálogo de tu negocio."
-                />
-              }
-            />
+            <Route path="products" element={<ProductsView />} />
+            <Route path="categories" element={<CategoriesView />} />
             <Route
               path="inventory"
               element={

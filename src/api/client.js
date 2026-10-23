@@ -57,4 +57,27 @@ export const api = {
   register: (data) => apiClient('/auth/register', { body: data, method: 'POST' }),
   logout: () => apiClient('/auth/logout', { method: 'POST' }),
   getMe: () => apiClient('/auth/me', { method: 'GET' }),
+
+  // Categories endpoints
+  getCategories: () => apiClient('/categories'),
+  createCategory: (data) => apiClient('/categories', { body: data, method: 'POST' }),
+  updateCategory: (id, data) => apiClient(`/categories/${id}`, { body: data, method: 'PATCH' }),
+  deleteCategory: (id) => apiClient(`/categories/${id}`, { method: 'DELETE' }),
+
+  // Products endpoints
+  getProducts: (params = {}) => {
+    const query = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        query.append(key, value);
+      }
+    });
+    const qs = query.toString();
+    return apiClient(`/products${qs ? `?${qs}` : ''}`);
+  },
+  getProductById: (id) => apiClient(`/products/${id}`),
+  createProduct: (data) => apiClient('/products', { body: data, method: 'POST' }),
+  updateProduct: (id, data) => apiClient(`/products/${id}`, { body: data, method: 'PATCH' }),
+  toggleProductStatus: (id, isActive) => apiClient(`/products/${id}/status`, { body: { isActive }, method: 'PATCH' }),
 };
+

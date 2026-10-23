@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   Package,
   LayoutDashboard,
@@ -36,6 +36,17 @@ export default function AppLayout() {
     { name: 'Reportes', path: '/reports', icon: BarChart3 },
     ...(role === 'OWNER' ? [{ name: 'Usuarios', path: '/settings/users', icon: Users }] : []),
   ];
+
+  const location = useLocation();
+  const getSectionTitle = () => {
+    if (location.pathname.startsWith('/products')) return 'Catálogo de Productos';
+    if (location.pathname.startsWith('/categories')) return 'Categorías';
+    if (location.pathname.startsWith('/inventory')) return 'Inventario y Stock';
+    if (location.pathname.startsWith('/sales')) return 'Punto de Venta';
+    if (location.pathname.startsWith('/reports')) return 'Reportes y Analíticas';
+    if (location.pathname.startsWith('/settings')) return 'Usuarios y Permisos';
+    return 'Panel de Control';
+  };
 
   return (
     <div className="min-h-screen bg-[#07090E] text-slate-100 flex flex-col md:flex-row selection:bg-emerald-500 selection:text-black">
@@ -151,13 +162,13 @@ export default function AppLayout() {
           <div className="flex items-center space-x-2 text-xs text-slate-400">
             <span className="text-slate-300 font-medium">{organization?.name || 'StockFlow'}</span>
             <span>/</span>
-            <span className="text-emerald-400 font-mono">Fase 2: Auth & Sistema</span>
+            <span className="text-emerald-400 font-mono">{getSectionTitle()}</span>
           </div>
 
           <div className="flex items-center space-x-3">
             <div className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
               <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Multi-Tenant Aisla DB</span>
+              <span>Multi-Tenant DB</span>
             </div>
           </div>
         </header>
