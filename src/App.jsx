@@ -9,6 +9,7 @@ import ProductsView from './features/products/ProductsView';
 import CategoriesView from './features/categories/CategoriesView';
 import InventoryView from './features/inventory/InventoryView';
 import PosView from './features/sales/PosView';
+import ReportsView from './features/reports/ReportsView';
 import SectionPlaceholder from './components/SectionPlaceholder';
 import { Loader2 } from 'lucide-react';
 
@@ -88,16 +89,7 @@ export default function App() {
             <Route path="categories" element={<CategoriesView />} />
             <Route path="inventory" element={<InventoryView />} />
             <Route path="sales" element={<PosView />} />
-            <Route
-              path="reports"
-              element={
-                <SectionPlaceholder
-                  title="Reportes y Analíticas"
-                  phase="Fase 6: Reportes"
-                  description="Métricas consolidadas de ventas por rango de fechas, productos más vendidos y cálculo de márgenes."
-                />
-              }
-            />
+            <Route path="reports" element={<ReportsView />} />
             <Route
               path="settings/users"
               element={

@@ -109,5 +109,17 @@ export const api = {
   getSaleById: (id) => apiClient(`/sales/${id}`),
   createSale: (data) => apiClient('/sales', { body: data, method: 'POST' }),
   cancelSale: (id, reason) => apiClient(`/sales/${id}/cancel`, { body: { reason }, method: 'POST' }),
+
+  // Reports & Analytics
+  getReports: (params = {}) => {
+    const query = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        query.append(key, value);
+      }
+    });
+    const qs = query.toString();
+    return apiClient(`/reports${qs ? `?${qs}` : ''}`);
+  },
 };
 
