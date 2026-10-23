@@ -304,8 +304,9 @@ export default function ProductsView() {
                     p.costPrice,
                     p.salePrice
                   );
-                  const isOutOfStock = p.currentStock <= 0;
-                  const isLowStock = p.currentStock <= p.minStock && !isOutOfStock;
+                  const currentStock = p.stockQuantity ?? p.currentStock ?? 0;
+                  const isOutOfStock = currentStock <= 0;
+                  const isLowStock = currentStock <= p.minStock && !isOutOfStock;
 
                   return (
                     <tr
@@ -378,12 +379,12 @@ export default function ProductsView() {
                         ) : isLowStock ? (
                           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-mono font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
                             <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
-                            Bajo stock ({p.currentStock})
+                            Bajo stock ({currentStock})
                           </span>
                         ) : (
                           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-mono font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                            {p.currentStock} uds
+                            {currentStock} uds
                           </span>
                         )}
                       </td>

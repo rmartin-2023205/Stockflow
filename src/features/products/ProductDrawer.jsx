@@ -52,7 +52,7 @@ export default function ProductDrawer({
         categoryId: product.categoryId || '',
         costPrice: product.costPrice ? String(product.costPrice) : '0',
         salePrice: product.salePrice ? String(product.salePrice) : '0',
-        currentStock: String(product.currentStock ?? 0),
+        currentStock: String(product.stockQuantity ?? product.currentStock ?? 0),
         minStock: String(product.minStock ?? 5),
         isActive: product.isActive ?? true,
       });
@@ -125,7 +125,7 @@ export default function ProductDrawer({
 
       if (!isEditing) {
         payload.sku = formData.sku.trim();
-        payload.currentStock = parseInt(formData.currentStock, 10) || 0;
+        payload.stockQuantity = parseInt(formData.currentStock, 10) || 0;
         await api.createProduct(payload);
       } else {
         // If editing SKU changed, include it
