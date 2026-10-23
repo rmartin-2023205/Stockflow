@@ -49,34 +49,47 @@ export default function AppLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-[#07090E] text-slate-100 flex flex-col md:flex-row selection:bg-emerald-500 selection:text-black">
+    <div className="min-h-screen bg-[#07090E] text-slate-100 flex flex-col selection:bg-emerald-500 selection:text-black">
       {/* Mobile Top Header */}
-      <div className="md:hidden flex items-center justify-between px-4 py-3 bg-[#0C0F16] border-b border-[#1B212D]">
+      <div className="md:hidden flex items-center justify-between px-4 py-3 bg-[#0A0D14] border-b border-[#161B26] sticky top-0 z-30">
         <div className="flex items-center space-x-2.5">
-          <div className="w-8 h-8 rounded-lg bg-[#141A23] border border-[#252E3E] flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
             <Package className="w-4 h-4 text-emerald-400" />
           </div>
           <span className="font-bold text-sm tracking-tight text-white">
             Stock<span className="text-emerald-400">Flow</span>
           </span>
         </div>
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="p-1.5 rounded-lg text-slate-400 hover:text-white bg-[#141A23] border border-[#252E3E]"
-        >
-          {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </button>
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-mono text-emerald-400 font-semibold">{getSectionTitle()}</span>
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-white bg-[#141A23] border border-[#252E3E] active:scale-95 transition"
+            aria-label="Toggle navigation menu"
+          >
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
       </div>
 
-      {/* Sidebar (Desktop & Mobile Drawer) */}
+      {/* Mobile Backdrop Overlay */}
+      {mobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black/70 backdrop-blur-xs z-40 md:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Sidebar: Fixed to viewport on desktop, full height, always anchored */}
       <aside
-        className={`fixed md:sticky top-0 z-30 h-screen w-64 bg-[#0A0D14] border-r border-[#161B26] flex flex-col justify-between transition-transform duration-200 ease-out md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 md:z-30 w-64 bg-[#0A0D14] border-r border-[#161B26] flex flex-col justify-between transition-transform duration-200 ease-out md:translate-x-0 ${
           mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
         <div className="flex flex-col h-full">
           {/* Brand Header */}
-          <div className="p-5 border-b border-[#161B26]">
+          <div className="p-5 border-b border-[#161B26] shrink-0">
             <div className="flex items-center space-x-3 mb-4">
               <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500/20 to-emerald-400/5 border border-emerald-500/30 flex items-center justify-center shadow-lg shadow-emerald-500/10">
                 <Package className="w-5 h-5 text-emerald-400" />
@@ -101,8 +114,8 @@ export default function AppLayout() {
             </div>
           </div>
 
-          {/* Navigation Links */}
-          <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+          {/* Navigation Links (Scrollable if viewport height is compact) */}
+          <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto min-h-0">
             {navItems.map((item) => {
               const Icon = item.icon;
               return (
@@ -129,10 +142,10 @@ export default function AppLayout() {
           </nav>
 
           {/* User Profile & Session Footer */}
-          <div className="p-3 border-t border-[#161B26]">
+          <div className="p-3 border-t border-[#161B26] shrink-0">
             <div className="p-2.5 rounded-xl bg-[#0F131C] border border-[#1A212E] flex items-center justify-between">
               <div className="flex items-center space-x-2.5 truncate">
-                <div className="w-7 h-7 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-xs font-bold text-emerald-300">
+                <div className="w-7 h-7 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-xs font-bold text-emerald-300 shrink-0">
                   {user?.name ? user.name[0].toUpperCase() : 'U'}
                 </div>
                 <div className="truncate">
@@ -146,7 +159,7 @@ export default function AppLayout() {
               <button
                 onClick={handleLogout}
                 title="Cerrar sesión"
-                className="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition cursor-pointer"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition cursor-pointer shrink-0"
               >
                 <LogOut className="w-4 h-4" />
               </button>
@@ -155,10 +168,10 @@ export default function AppLayout() {
         </div>
       </aside>
 
-      {/* Main View Area */}
-      <div className="flex-1 flex flex-col min-h-screen">
-        {/* Top Navbar */}
-        <header className="h-14 border-b border-[#161B26] bg-[#0A0D14]/70 backdrop-blur-md px-6 flex items-center justify-between sticky top-0 z-20">
+      {/* Main View Area (offset by sidebar width on desktop) */}
+      <div className="flex-1 md:pl-64 flex flex-col min-h-screen w-full">
+        {/* Top Navbar (Desktop) */}
+        <header className="hidden md:flex h-14 border-b border-[#161B26] bg-[#0A0D14]/80 backdrop-blur-md px-6 items-center justify-between sticky top-0 z-20">
           <div className="flex items-center space-x-2 text-xs text-slate-400">
             <span className="text-slate-300 font-medium">{organization?.name || 'StockFlow'}</span>
             <span>/</span>
@@ -166,7 +179,7 @@ export default function AppLayout() {
           </div>
 
           <div className="flex items-center space-x-3">
-            <div className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
               <ShieldCheck className="w-3.5 h-3.5" />
               <span>Multi-Tenant DB</span>
             </div>
