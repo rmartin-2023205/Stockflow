@@ -94,5 +94,20 @@ export const api = {
     return apiClient(`/inventory/movements${qs ? `?${qs}` : ''}`);
   },
   createStockMovement: (data) => apiClient('/inventory/movements', { body: data, method: 'POST' }),
+
+  // Sales & POS endpoints
+  getSales: (params = {}) => {
+    const query = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        query.append(key, value);
+      }
+    });
+    const qs = query.toString();
+    return apiClient(`/sales${qs ? `?${qs}` : ''}`);
+  },
+  getSaleById: (id) => apiClient(`/sales/${id}`),
+  createSale: (data) => apiClient('/sales', { body: data, method: 'POST' }),
+  cancelSale: (id, reason) => apiClient(`/sales/${id}/cancel`, { body: { reason }, method: 'POST' }),
 };
 

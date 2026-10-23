@@ -8,6 +8,7 @@ import DashboardView from './features/dashboard/DashboardView';
 import ProductsView from './features/products/ProductsView';
 import CategoriesView from './features/categories/CategoriesView';
 import InventoryView from './features/inventory/InventoryView';
+import PosView from './features/sales/PosView';
 import SectionPlaceholder from './components/SectionPlaceholder';
 import { Loader2 } from 'lucide-react';
 
@@ -86,16 +87,7 @@ export default function App() {
             <Route path="products" element={<ProductsView />} />
             <Route path="categories" element={<CategoriesView />} />
             <Route path="inventory" element={<InventoryView />} />
-            <Route
-              path="sales"
-              element={
-                <SectionPlaceholder
-                  title="Punto de Venta Transaccional (POS)"
-                  phase="Fase 5: Ventas"
-                  description="Terminal de cobro rápido, carrito reactivo, deducción atómica de inventario y generación de comprobantes internos."
-                />
-              }
-            />
+            <Route path="sales" element={<PosView />} />
             <Route
               path="reports"
               element={
