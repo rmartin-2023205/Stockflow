@@ -79,5 +79,20 @@ export const api = {
   createProduct: (data) => apiClient('/products', { body: data, method: 'POST' }),
   updateProduct: (id, data) => apiClient(`/products/${id}`, { body: data, method: 'PATCH' }),
   toggleProductStatus: (id, isActive) => apiClient(`/products/${id}/status`, { body: { isActive }, method: 'PATCH' }),
+
+  // Inventory endpoints
+  getInventorySummary: () => apiClient('/inventory/summary'),
+  getLowStockProducts: () => apiClient('/inventory/low-stock'),
+  getStockMovements: (params = {}) => {
+    const query = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        query.append(key, value);
+      }
+    });
+    const qs = query.toString();
+    return apiClient(`/inventory/movements${qs ? `?${qs}` : ''}`);
+  },
+  createStockMovement: (data) => apiClient('/inventory/movements', { body: data, method: 'POST' }),
 };
 

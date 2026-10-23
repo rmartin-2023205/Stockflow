@@ -7,6 +7,7 @@ import RegisterView from './features/auth/RegisterView';
 import DashboardView from './features/dashboard/DashboardView';
 import ProductsView from './features/products/ProductsView';
 import CategoriesView from './features/categories/CategoriesView';
+import InventoryView from './features/inventory/InventoryView';
 import SectionPlaceholder from './components/SectionPlaceholder';
 import { Loader2 } from 'lucide-react';
 
@@ -84,16 +85,7 @@ export default function App() {
             <Route path="dashboard" element={<DashboardView />} />
             <Route path="products" element={<ProductsView />} />
             <Route path="categories" element={<CategoriesView />} />
-            <Route
-              path="inventory"
-              element={
-                <SectionPlaceholder
-                  title="Movimientos y Ajustes de Inventario"
-                  phase="Fase 4: Inventario"
-                  description="Trazabilidad histórica inmutable de entradas, salidas y ajustes manuales con motivo obligatorio."
-                />
-              }
-            />
+            <Route path="inventory" element={<InventoryView />} />
             <Route
               path="sales"
               element={
