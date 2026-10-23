@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { api } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
+import { useProducts } from '../../hooks';
 import { formatCurrency, calculateProfitAndMargin } from '../../utils/format';
 import ProductDrawer from './ProductDrawer';
 
@@ -28,71 +29,35 @@ export default function ProductsView() {
   const currency = organization?.currency || 'GTQ';
   const isOwner = role === 'OWNER';
 
-  // Products and Categories State
-  const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [meta, setMeta] = useState({ total: 0, page: 1, limit: 15, totalPages: 1 });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  // Filters State
-  const [search, setSearch] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all'); // all, active, inactive
-  const [page, setPage] = useState(1);
+  // Use custom hook for products, categories, filters and pagination
+  const {
+    products,
+    categories,
+    meta,
+    loading,
+    error,
+    search,
+    setSearch,
+    selectedCategory,
+    setSelectedCategory,
+    statusFilter,
+    setStatusFilter,
+    page,
+    setPage,
+    togglingId,
+    toggleProductStatus,
+    refreshProducts,
+    refreshCategories,
+  } = useProducts();
 
   // Drawer State
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
 
-  // Status toggle in-flight tracker
-  const [togglingId, setTogglingId] = useState(null);
-
-  // Load categories once
-  const loadCategories = useCallback(async () => {
-    try {
-      const data = await api.getCategories();
-      setCategories(data.data || []);
-    } catch (err) {
-      console.error('Error al cargar categorías:', err);
-    }
-  }, []);
-
-  // Fetch products with current filters
-  const fetchProducts = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const params = {
-        page,
-        limit: 15,
-        status: statusFilter,
-      };
-      if (search.trim()) params.search = search.trim();
-      if (selectedCategory) params.categoryId = selectedCategory;
-
-      const response = await api.getProducts(params);
-      setProducts(response.data.products || []);
-      setMeta(response.data.meta || { total: 0, page: 1, limit: 15, totalPages: 1 });
-    } catch (err) {
-      setError(err.message || 'Error al obtener el catálogo de productos.');
-    } finally {
-      setLoading(false);
-    }
-  }, [page, search, selectedCategory, statusFilter]);
-
-  useEffect(() => {
-    loadCategories();
-  }, [loadCategories]);
-
-  useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
-
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     setPage(1);
-    fetchProducts();
+    refreshProducts();
   };
 
   const handleOpenCreate = () => {
@@ -105,21 +70,9 @@ export default function ProductsView() {
     setIsDrawerOpen(true);
   };
 
-  const handleToggleStatus = async (product) => {
+  const handleToggleStatus = (product) => {
     if (!isOwner) return;
-    setTogglingId(product.id);
-    try {
-      const newStatus = !product.isActive;
-      await api.toggleProductStatus(product.id, newStatus);
-      // Optimistic or refresh
-      setProducts((prev) =>
-        prev.map((p) => (p.id === product.id ? { ...p, isActive: newStatus } : p))
-      );
-    } catch (err) {
-      alert(err.message || 'Error al cambiar estado del producto.');
-    } finally {
-      setTogglingId(null);
-    }
+    toggleProductStatus(product);
   };
 
   return (
@@ -472,8 +425,8 @@ export default function ProductsView() {
         product={editingProduct}
         categories={categories}
         onSuccess={() => {
-          fetchProducts();
-          loadCategories();
+          refreshProducts();
+          refreshCategories();
         }}
       />
     </div>

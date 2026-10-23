@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { api } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
+import { useCart, useDebounce } from '../../hooks';
 import { formatCurrency } from '../../utils/format';
 import CheckoutModal from './CheckoutModal';
 import ReceiptModal from './ReceiptModal';
@@ -33,14 +34,27 @@ export default function PosView() {
   const [categories, setCategories] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
 
-  // Search & Filter
+  // Search & Filter with Debounce
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 200);
   const [selectedCategory, setSelectedCategory] = useState('');
   const searchInputRef = useRef(null);
 
-  // Cart State: [{ product, quantity }]
-  const [cart, setCart] = useState([]);
-  const [discount, setDiscount] = useState(0);
+  // Shopping Cart Custom Hook
+  const {
+    cart,
+    discount,
+    setDiscount,
+    subtotal,
+    discountTotal,
+    total,
+    totalItemsCount,
+    addToCart,
+    updateQuantity,
+    removeFromCart,
+    clearCart,
+  } = useCart();
+
   const [showDiscountInput, setShowDiscountInput] = useState(false);
 
   // Modals
@@ -76,79 +90,19 @@ export default function PosView() {
     searchInputRef.current?.focus();
   }, []);
 
-  // Filter products by search and category
+  // Filter products by debounced search and category
   const filteredProducts = products.filter((p) => {
+    const term = debouncedSearch.toLowerCase().trim();
     const matchesSearch =
-      !search ||
-      p.name.toLowerCase().includes(search.toLowerCase()) ||
-      p.sku.toLowerCase().includes(search.toLowerCase());
+      !term ||
+      p.name.toLowerCase().includes(term) ||
+      p.sku.toLowerCase().includes(term);
     const matchesCategory = !selectedCategory || p.categoryId === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
-  // Cart Calculations
-  const subtotal = cart.reduce((acc, item) => {
-    const price = parseFloat(item.product.salePrice) || 0;
-    return acc + price * item.quantity;
-  }, 0);
-
-  const roundedSubtotal = Math.round(subtotal * 100) / 100;
-  const sanitizedDiscount = Math.min(roundedSubtotal, Math.max(0, discount));
-  const total = Math.round((roundedSubtotal - sanitizedDiscount) * 100) / 100;
-  const totalItemsCount = cart.reduce((acc, item) => acc + item.quantity, 0);
-
-  // Add Product to Cart
-  const handleAddToCart = (product) => {
-    const availableStock = product.stockQuantity ?? product.currentStock ?? 0;
-    if (availableStock <= 0) return;
-
-    setCart((prev) => {
-      const existing = prev.find((item) => item.product.id === product.id);
-      if (existing) {
-        if (existing.quantity >= availableStock) {
-          alert(`No puedes agregar más unidades. Stock disponible: ${availableStock}.`);
-          return prev;
-        }
-        return prev.map((item) =>
-          item.product.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      }
-      return [...prev, { product, quantity: 1 }];
-    });
-  };
-
-  // Modify Cart Item Quantity
-  const handleUpdateQuantity = (productId, delta) => {
-    setCart((prev) => {
-      return prev
-        .map((item) => {
-          if (item.product.id === productId) {
-            const availableStock = item.product.stockQuantity ?? item.product.currentStock ?? 0;
-            const newQty = item.quantity + delta;
-
-            if (newQty > availableStock) {
-              alert(`Stock máximo disponible alcanzado: ${availableStock}.`);
-              return item;
-            }
-            return newQty > 0 ? { ...item, quantity: newQty } : null;
-          }
-          return item;
-        })
-        .filter(Boolean);
-    });
-  };
-
-  // Remove Item
-  const handleRemoveFromCart = (productId) => {
-    setCart((prev) => prev.filter((item) => item.product.id !== productId));
-  };
-
-  // Clear Cart
   const handleClearCart = () => {
-    setCart([]);
-    setDiscount(0);
+    clearCart();
     setShowDiscountInput(false);
   };
 
@@ -162,7 +116,7 @@ export default function PosView() {
           quantity: item.quantity,
         })),
         paymentMethod,
-        discountTotal: sanitizedDiscount,
+        discountTotal,
         amountReceived,
       };
 
@@ -272,7 +226,7 @@ export default function PosView() {
                   <button
                     key={p.id}
                     disabled={isOutOfStock}
-                    onClick={() => handleAddToCart(p)}
+                    onClick={() => addToCart(p)}
                     className={`p-3.5 rounded-2xl bg-[#0D1017] border text-left flex flex-col justify-between transition-all group ${
                       isOutOfStock
                         ? 'border-[#1A212F] opacity-50 cursor-not-allowed'
@@ -385,7 +339,7 @@ export default function PosView() {
                         </div>
 
                         <button
-                          onClick={() => handleRemoveFromCart(item.product.id)}
+                          onClick={() => removeFromCart(item.product.id)}
                           className="text-slate-500 hover:text-red-400 transition p-1 cursor-pointer"
                         >
                           <X className="w-3.5 h-3.5" />
@@ -396,7 +350,7 @@ export default function PosView() {
                       <div className="flex items-center justify-between pt-1 border-t border-[#1C2232]">
                         <div className="flex items-center space-x-1.5 bg-[#0C0F16] border border-[#1E2536] rounded-lg p-0.5">
                           <button
-                            onClick={() => handleUpdateQuantity(item.product.id, -1)}
+                            onClick={() => updateQuantity(item.product.id, -1)}
                             className="p-1 rounded text-slate-400 hover:text-white hover:bg-[#181E2C] transition cursor-pointer"
                           >
                             <Minus className="w-3 h-3" />
@@ -405,7 +359,7 @@ export default function PosView() {
                             {item.quantity}
                           </span>
                           <button
-                            onClick={() => handleUpdateQuantity(item.product.id, 1)}
+                            onClick={() => updateQuantity(item.product.id, 1)}
                             disabled={item.quantity >= available}
                             className="p-1 rounded text-slate-400 hover:text-white hover:bg-[#181E2C] transition cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
                           >
@@ -438,7 +392,7 @@ export default function PosView() {
 
                 {discount > 0 && (
                   <span className="font-mono text-amber-400 text-xs">
-                    -{formatCurrency(sanitizedDiscount, currency)}
+                    -{formatCurrency(discountTotal, currency)}
                   </span>
                 )}
               </div>
@@ -462,7 +416,7 @@ export default function PosView() {
               <div className="space-y-1.5 pt-1 border-t border-[#161B26] text-xs">
                 <div className="flex justify-between text-slate-400">
                   <span>Subtotal:</span>
-                  <span className="font-mono">{formatCurrency(roundedSubtotal, currency)}</span>
+                  <span className="font-mono">{formatCurrency(subtotal, currency)}</span>
                 </div>
 
                 <div className="flex justify-between items-baseline pt-1">
@@ -494,8 +448,8 @@ export default function PosView() {
         isOpen={checkoutOpen}
         onClose={() => setCheckoutOpen(false)}
         total={total}
-        subtotal={roundedSubtotal}
-        discount={sanitizedDiscount}
+        subtotal={subtotal}
+        discount={discountTotal}
         currency={currency}
         loading={checkoutLoading}
         onConfirmCheckout={handleConfirmCheckout}
