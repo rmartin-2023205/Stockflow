@@ -10,7 +10,7 @@ import CategoriesView from './features/categories/CategoriesView';
 import InventoryView from './features/inventory/InventoryView';
 import PosView from './features/sales/PosView';
 import ReportsView from './features/reports/ReportsView';
-import SectionPlaceholder from './components/SectionPlaceholder';
+import UsersView from './features/users/UsersView';
 import { Loader2 } from 'lucide-react';
 
 function ProtectedRoute({ children }) {
@@ -90,16 +90,7 @@ export default function App() {
             <Route path="inventory" element={<InventoryView />} />
             <Route path="sales" element={<PosView />} />
             <Route path="reports" element={<ReportsView />} />
-            <Route
-              path="settings/users"
-              element={
-                <SectionPlaceholder
-                  title="Gestión de Usuarios y Cajeros"
-                  phase="Fase 2: Permisos"
-                  description="Invita cajeros y administra roles y accesos exclusivos para tu organización."
-                />
-              }
-            />
+            <Route path="settings/users" element={<UsersView />} />
           </Route>
 
           {/* Fallback */}

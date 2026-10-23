@@ -121,5 +121,13 @@ export const api = {
     const qs = query.toString();
     return apiClient(`/reports${qs ? `?${qs}` : ''}`);
   },
+
+  // Dashboard & Real-Time Overview
+  getDashboardSummary: () => apiClient('/dashboard/summary'),
+
+  // Staff & Members
+  getMembers: () => apiClient('/organizations/members'),
+  addMember: (data) => apiClient('/organizations/members', { body: data, method: 'POST' }),
+  removeMember: (membershipId) => apiClient(`/organizations/members/${membershipId}`, { method: 'DELETE' }),
 };
 
