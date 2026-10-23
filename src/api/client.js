@@ -51,4 +51,10 @@ export const api = {
   patch: (endpoint, body, options) => apiClient(endpoint, { ...options, method: 'PATCH', body }),
   delete: (endpoint, options) => apiClient(endpoint, { ...options, method: 'DELETE' }),
   checkHealth: () => apiClient('/health'),
+  
+  // Auth endpoints
+  login: (credentials) => apiClient('/auth/login', { body: credentials, method: 'POST' }),
+  register: (data) => apiClient('/auth/register', { body: data, method: 'POST' }),
+  logout: () => apiClient('/auth/logout', { method: 'POST' }),
+  getMe: () => apiClient('/auth/me', { method: 'GET' }),
 };
