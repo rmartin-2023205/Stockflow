@@ -1,7 +1,10 @@
 /**
  * Centralized API client for StockFlow
  */
-const API_BASE = import.meta.env.VITE_API_URL || '/api';
+const rawApiUrl = (import.meta.env.VITE_API_URL || '').trim().replace(/\/$/, '');
+const API_BASE = rawApiUrl
+  ? (rawApiUrl.endsWith('/api') ? rawApiUrl : `${rawApiUrl}/api`)
+  : '/api';
 
 export async function apiClient(endpoint, options = {}) {
   const { body, headers, ...customConfig } = options;
