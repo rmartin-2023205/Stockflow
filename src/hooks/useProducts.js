@@ -96,6 +96,7 @@ export function useProducts(initialFilters = {}) {
     togglingId,
     toggleProductStatus,
     refreshProducts: loadProducts,
+    fetchProducts: loadProducts,
     refreshCategories: loadCategories,
   };
 }

@@ -188,7 +188,7 @@ export default function ProductsView() {
 
           {/* Refresh Button */}
           <button
-            onClick={fetchProducts}
+            onClick={refreshProducts}
             title="Recargar catálogo"
             className="p-2 rounded-xl bg-[#121622] border border-[#1E2536] text-slate-400 hover:text-white hover:bg-[#181E2E] transition cursor-pointer"
           >
@@ -209,7 +209,7 @@ export default function ProductsView() {
             <AlertTriangle className="w-8 h-8 text-red-400 mx-auto" />
             <p className="text-xs text-red-300">{error}</p>
             <button
-              onClick={fetchProducts}
+              onClick={refreshProducts}
               className="px-3.5 py-1.5 rounded-xl bg-[#141A24] border border-[#232B3A] text-xs text-white hover:bg-[#1B2332] cursor-pointer"
             >
               Reintentar
